@@ -352,13 +352,13 @@ func L2OutputOracleNewVersion(batch *safe.Batch, proxyAddresses map[string]commo
 
 	calldata, err := l2OutputOracleABI.Pack(
 		"initialize",
-		3600,
-		1,
-		0,
-		1742971748,
+		big.NewInt(3600),
+		big.NewInt(1),
+		big.NewInt(0),
+		big.NewInt(1742971748),
 		addressA,
 		addressA,
-		3600,
+		big.NewInt(3600),
 	)
 	if err != nil {
 		return err
