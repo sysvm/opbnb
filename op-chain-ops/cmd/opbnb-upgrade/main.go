@@ -96,13 +96,13 @@ func entrypoint(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("wewneecn")
 
 	// Fetch the L1 chain ID to determine the superchain name
 	l1ChainID, err := client.ChainID(ctx.Context)
 	if err != nil {
 		return err
 	}
+	fmt.Println("l1ChainID: ", l1ChainID.Int64())
 
 	proxyAddresses := opbnb_upgrades.BscTestProxyContracts
 	implAddresses := opbnb_upgrades.BscTestImplContracts
