@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -11,10 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/mattn/go-isatty"
 	"github.com/urfave/cli/v2"
-	"os"
-	"time"
 
-	"github.com/ethereum-optimism/optimism/op-chain-ops/opbnb-upgrades"
+	opbnb_upgrades "github.com/ethereum-optimism/optimism/op-chain-ops/opbnb-upgrades"
 	oldBindings "github.com/ethereum-optimism/optimism/op-chain-ops/opbnb-upgrades/old-contracts/bindings"
 	"github.com/ethereum-optimism/optimism/op-chain-ops/safe"
 	"github.com/ethereum-optimism/optimism/op-service/jsonutil"
@@ -95,6 +96,7 @@ func entrypoint(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("wewneecn")
 
 	// Fetch the L1 chain ID to determine the superchain name
 	l1ChainID, err := client.ChainID(ctx.Context)
@@ -102,22 +104,26 @@ func entrypoint(ctx *cli.Context) error {
 		return err
 	}
 
-	proxyAddresses := opbnb_upgrades.BscQAnetProxyContracts
-	implAddresses := opbnb_upgrades.BscQAnetImplContracts
-	batchInboxAddr := opbnb_upgrades.BscQAnetBatcherInbox
-	if l1ChainID.Uint64() == opbnb_upgrades.BscTestnet && !ctx.Bool("qa_net") {
-		proxyAddresses = opbnb_upgrades.BscTestnetProxyContracts
-		implAddresses = opbnb_upgrades.BscTestnetImplContracts
-		batchInboxAddr = opbnb_upgrades.BscTestnetBatcherInbox
-		fmt.Println("using bscTestnet")
-	} else if l1ChainID.Uint64() == opbnb_upgrades.BscMainnet {
-		proxyAddresses = opbnb_upgrades.BscMainnetProxyContracts
-		implAddresses = opbnb_upgrades.BscMainnetImplContracts
-		batchInboxAddr = opbnb_upgrades.BscMainnetBatcherInbox
-		fmt.Println("using bscMainnet")
-	} else {
-		fmt.Println("using bscQAnet")
-	}
+	proxyAddresses := opbnb_upgrades.BscTestProxyContracts
+	implAddresses := opbnb_upgrades.BscTestImplContracts
+	batchInboxAddr := opbnb_upgrades.BscTestnetBatcherInbox
+
+	// proxyAddresses := opbnb_upgrades.BscQAnetProxyContracts
+	// implAddresses := opbnb_upgrades.BscQAnetImplContracts
+	// batchInboxAddr := opbnb_upgrades.BscQAnetBatcherInbox
+	// if l1ChainID.Uint64() == opbnb_upgrades.BscTestnet && !ctx.Bool("qa_net") {
+	// 	proxyAddresses = opbnb_upgrades.BscTestnetProxyContracts
+	// 	implAddresses = opbnb_upgrades.BscTestnetImplContracts
+	// 	batchInboxAddr = opbnb_upgrades.BscTestnetBatcherInbox
+	// 	fmt.Println("using bscTestnet")
+	// } else if l1ChainID.Uint64() == opbnb_upgrades.BscMainnet {
+	// 	proxyAddresses = opbnb_upgrades.BscMainnetProxyContracts
+	// 	implAddresses = opbnb_upgrades.BscMainnetImplContracts
+	// 	batchInboxAddr = opbnb_upgrades.BscMainnetBatcherInbox
+	// 	fmt.Println("using bscMainnet")
+	// } else {
+	// 	fmt.Println("using bscQAnet")
+	// }
 
 	if ctx.IsSet("transfer_owner") {
 		if !ctx.IsSet("private_key") {
@@ -240,9 +246,12 @@ func entrypoint(ctx *cli.Context) error {
 	batch := safe.Batch{}
 
 	// Build the batch
-	if err := opbnb_upgrades.L1(&batch, proxyAddresses, implAddresses, client, l1ChainID); err != nil {
+	if err := opbnb_upgrades.L1Custom(&batch, proxyAddresses, implAddresses, client, l1ChainID); err != nil {
 		return err
 	}
+	// if err := opbnb_upgrades.L1(&batch, proxyAddresses, implAddresses, client, l1ChainID); err != nil {
+	// 	return err
+	// }
 
 	// Write the batch to disk or stdout
 	if outfile := ctx.Path("outfile"); outfile != "" {

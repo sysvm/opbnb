@@ -2,9 +2,10 @@ package opbnb_upgrades
 
 import (
 	"fmt"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"math/big"
 
 	newBindings "github.com/ethereum-optimism/optimism/op-chain-ops/opbnb-upgrades/new-contracts/bindings"
 	oldBindings "github.com/ethereum-optimism/optimism/op-chain-ops/opbnb-upgrades/old-contracts/bindings"
@@ -19,6 +20,14 @@ const (
 
 	method = "setBytes32"
 )
+
+func L1Custom(batch *safe.Batch, proxyAddresses map[string]common.Address, implAddresses map[string]common.Address, backend bind.ContractBackend, chainId *big.Int) error {
+	if err := L2OutputOracle(batch, proxyAddresses, implAddresses, backend); err != nil {
+		return fmt.Errorf("upgrading L2OutputOracle: %w", err)
+	}
+
+	return nil
+}
 
 // L1 will add calls for upgrading each of the L1 contracts.
 func L1(batch *safe.Batch, proxyAddresses map[string]common.Address, implAddresses map[string]common.Address, backend bind.ContractBackend, chainId *big.Int) error {
@@ -317,6 +326,47 @@ func L1StandardBridge(batch *safe.Batch, proxyAddresses map[string]common.Addres
 	args := []any{
 		proxyAddresses["L1StandardBridgeProxy"],
 		implAddresses["L1StandardBridge"],
+		calldata,
+	}
+
+	if err := batch.AddCall(implAddresses["ProxyAdmin"], common.Big0, upgradeAndCall, args, proxyAdminABI); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// L2OutputOracle will add a call to the batch that upgrades the L2OutputOracle.
+func L2OutputOracleNewVersion(batch *safe.Batch, proxyAddresses map[string]common.Address, implAddresses map[string]common.Address, backend bind.ContractBackend) error {
+	proxyAdminABI, err := oldBindings.ProxyAdminMetaData.GetAbi()
+	if err != nil {
+		return err
+	}
+
+	l2OutputOracleABI, err := newBindings.L2OutputOracleMetaData.GetAbi()
+	if err != nil {
+		return err
+	}
+
+	addressA := common.BytesToAddress([]byte("0x3fC31df5B7a85611138ee0AF7F3363897f5aD730"))
+
+	calldata, err := l2OutputOracleABI.Pack(
+		"initialize",
+		3600,
+		1,
+		0,
+		1742971748,
+		addressA,
+		addressA,
+		3600,
+	)
+	if err != nil {
+		return err
+	}
+
+	args := []any{
+		proxyAddresses["L2OutputOracleProxy"],
+		implAddresses["L2OutputOracle"],
 		calldata,
 	}
 

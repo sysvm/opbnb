@@ -101,3 +101,12 @@ var BscQAnetImplContracts = map[string]common.Address{
 	"ProxyAdmin":                   common.HexToAddress("0x28Fa925aD1CC9C8F0c4daF601BfaB0b36e576a71"),
 	"StorageSetter":                common.HexToAddress("0x954E3c51483BAb314e23F740bd9Ff9A4cDEA74dd"),
 }
+
+var BscTestProxyContracts = map[string]common.Address{
+	"L2OutputOracleProxy": common.HexToAddress("0x993D554129CBdCF04dc0FBdc88FB36E5442c344F"),
+}
+
+var BscTestImplContracts = map[string]common.Address{
+	"ProxyAdmin":     common.HexToAddress("0x025F5CE2cd381D832cEe17Eb0F6A8Bc5c3592f43"),
+	"L2OutputOracle": common.HexToAddress("0x41316E438f97786a09763d7F69Fc8212BACD02dd"),
+}
