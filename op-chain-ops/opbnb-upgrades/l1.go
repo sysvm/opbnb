@@ -22,7 +22,7 @@ const (
 )
 
 func L1Custom(batch *safe.Batch, proxyAddresses map[string]common.Address, implAddresses map[string]common.Address, backend bind.ContractBackend, chainId *big.Int) error {
-	if err := L2OutputOracle(batch, proxyAddresses, implAddresses, backend); err != nil {
+	if err := L2OutputOracleNewVersion(batch, proxyAddresses, implAddresses, backend); err != nil {
 		return fmt.Errorf("upgrading L2OutputOracle: %w", err)
 	}
 
