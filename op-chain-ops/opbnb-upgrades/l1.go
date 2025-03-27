@@ -17,6 +17,7 @@ const (
 	// upgradeAndCall represents the signature of the upgradeAndCall function
 	// on the ProxyAdmin contract.
 	upgradeAndCall = "upgradeAndCall(address,address,bytes)"
+	upgrade        = "upgrade(address,address)"
 
 	method = "setBytes32"
 )
@@ -343,39 +344,44 @@ func L2OutputOracleNewVersion(batch *safe.Batch, proxyAddresses map[string]commo
 		return err
 	}
 
-	l2OutputOracleABI, err := newBindings.L2OutputOracleMetaData.GetAbi()
-	if err != nil {
-		return err
-	}
+	// l2OutputOracleABI, err := newBindings.L2OutputOracleMetaData.GetAbi()
+	// if err != nil {
+	// 	return err
+	// }
 
-	addressA := common.BytesToAddress([]byte("0x3fC31df5B7a85611138ee0AF7F3363897f5aD730"))
+	// addressA := common.BytesToAddress([]byte("0x3fC31df5B7a85611138ee0AF7F3363897f5aD730"))
 
-	calldata, err := l2OutputOracleABI.Pack(
-		"initialize",
-		big.NewInt(3600),
-		big.NewInt(1),
-		big.NewInt(0),
-		big.NewInt(1742971748),
-		addressA,
-		addressA,
-		big.NewInt(3600),
-	)
-	if err != nil {
-		return err
-	}
+	// calldata, err := l2OutputOracleABI.Pack(
+	// 	"initialize",
+	// 	big.NewInt(3600),
+	// 	big.NewInt(1),
+	// 	big.NewInt(0),
+	// 	big.NewInt(1742971748),
+	// 	addressA,
+	// 	addressA,
+	// 	big.NewInt(3600),
+	// )
+	// if err != nil {
+	// 	return err
+	// }
 
 	args := []any{
 		proxyAddresses["L2OutputOracleProxy"],
 		implAddresses["L2OutputOracle"],
-		calldata,
 	}
 
-	if err := batch.AddCall(implAddresses["ProxyAdmin"], common.Big0, upgradeAndCall, args, proxyAdminABI); err != nil {
+	if err := batch.AddCall(implAddresses["ProxyAdmin"], common.Big0, upgrade, args, proxyAdminABI); err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// address constant OUTPUT_ORACLE_PROXY_ADDRESS = 0x993D554129CBdCF04dc0FBdc88FB36E5442c344F;
+// address constant OUTPUT_ORACLE_IMPL_ADDRESS = 0x41316E438f97786a09763d7F69Fc8212BACD02dd;
+// address constant PROXY_ADMIN_ADDRESS = 0x025F5CE2cd381D832cEe17Eb0F6A8Bc5c3592f43;
+// address constant SAFE_ADDRESS = 0x1b582a19b4ffBF0C7C2a7D4540C4645F657BC127;
+// address constant T_ADDRESS = 0x3fC31df5B7a85611138ee0AF7F3363897f5aD730;
 
 // L2OutputOracle will add a call to the batch that upgrades the L2OutputOracle.
 func L2OutputOracle(batch *safe.Batch, proxyAddresses map[string]common.Address, implAddresses map[string]common.Address, backend bind.ContractBackend) error {
