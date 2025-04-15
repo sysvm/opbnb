@@ -108,5 +108,5 @@ var BscTestProxyContracts = map[string]common.Address{
 
 var BscTestImplContracts = map[string]common.Address{
 	"ProxyAdmin":     common.HexToAddress("0x27a591Ec09AAfEEb39d7533AEf7C64E0305D1576"),
-	"L2OutputOracle": common.HexToAddress("0x7b3C7E2269D92194397D62F948DaC82F104e3788"),
+	"L2OutputOracle": common.HexToAddress("0x025F5CE2cd381D832cEe17Eb0F6A8Bc5c3592f43"),
 }
